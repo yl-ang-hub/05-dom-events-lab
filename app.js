@@ -50,7 +50,6 @@ function calculate(operator, accumulator, prevOperator) {
    */
   let curr = parseInt(getDisplay());
   if (operator === "C") {
-    console.log("C is running");
     updateDisplay("");
     return [null, null];
   }
@@ -85,6 +84,10 @@ function updateDisplay(display, prevInputIsOperator = false) {
 function getDisplay() {
   return document.querySelector(".display").innerText;
 }
+
 /*----------------------------- Fringe Cases ------------------------------*/
-// DONE: press operator multiple times - expected behaviour to operate on accumulator & displayed num
-// type 0 first
+// DONE: press operator multiple times
+// - expected behaviour: old school (selected operation done on accumulator & displayed num)
+// In Progress: type 0 first
+// - expected behaviour: 0 not allowed unless it's preceded by an operation (DONE)
+// - expected behaviour: 0 not allowed IF preceded by operation of C or = (in progress)
