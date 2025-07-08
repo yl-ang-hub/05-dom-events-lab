@@ -10,29 +10,31 @@ let prevInputIsOperator = false;
 // EVENT DELEGATION -- ADD EVENT LISTENERS TO PARENT ELEMENT
 const calculator = document.querySelector("#calculator");
 calculator.addEventListener("click", (event) => {
-  if (event.target.classList.contains("number")) {
+  if (event.target.innerText === "C") {
+    [accumulator, prevOperator] = calculate(
+      event.target.innerText,
+      accumulator,
+      prevOperator
+    );
+  } else if (event.target.classList.contains("number")) {
     // Update display
     if (prevInputIsOperator) {
-      updateDisplay(event.target.innerHTML);
-    } else if (getDisplay() === "" && event.target.innerHTML === "0") {
+      updateDisplay(event.target.innerText, prevInputIsOperator);
+    } else if (getDisplay() === "" && event.target.innerText === "0") {
       // pass - do not update display
     } else {
-      updateDisplay(getDisplay() + event.target.innerHTML);
+      updateDisplay(getDisplay() + event.target.innerText);
     }
     prevInputIsOperator = false;
-  } else {
-    if (event.target.innerHTML === "C") {
-      accumulator = null;
-      prevOperator = null;
-      updateDisplay("");
-    } else if (accumulator === null && prevOperator === null) {
+  } else if (event.target.classList.contains("button")) {
+    if (accumulator === null && prevOperator === null) {
       accumulator = parseInt(getDisplay());
-      prevOperator = event.target.innerHTML;
+      prevOperator = event.target.innerText;
     } else if (prevOperator === null) {
-      prevOperator = event.target.innerHTML;
+      prevOperator = event.target.innerText;
     } else {
       [accumulator, prevOperator] = calculate(
-        event.target.innerHTML,
+        event.target.innerText,
         accumulator,
         prevOperator
       );
@@ -42,41 +44,46 @@ calculator.addEventListener("click", (event) => {
 });
 
 /*-------------------------------- Functions --------------------------------*/
-const add = (a, b) => a + b;
-const subt = (a, b) => a - b;
-const mult = (a, b) => a * b;
-const div = (a, b) => a / b;
-
 function calculate(operator, accumulator, prevOperator) {
+  /**
+   * @return [accumulator, prevOperator]
+   */
   let curr = parseInt(getDisplay());
+  if (operator === "C") {
+    console.log("C is running");
+    updateDisplay("");
+    return [null, null];
+  }
   switch (prevOperator) {
     case "+":
-      accumulator = add(accumulator, curr);
+      accumulator += curr;
       break;
     case "-":
-      accumulator = subt(accumulator, curr);
+      accumulator -= curr;
       break;
     case "*":
-      accumulator = mult(accumulator, curr);
+      accumulator *= curr;
       break;
     case "/":
-      accumulator = div(accumulator, curr);
+      accumulator /= curr;
       break;
   }
-  if (operator == "=") {
-    prevOperator = null;
-  } else {
-    prevOperator = operator;
-  }
   updateDisplay(accumulator);
-  return [accumulator, prevOperator];
+  if (operator === "=") {
+    return [null, null];
+  } else {
+    return [accumulator, operator];
+  }
 }
 
-function updateDisplay(display) {
-  document.querySelector(".display").innerHTML = display;
+function updateDisplay(display, prevInputIsOperator = false) {
+  !prevInputIsOperator && display === "0"
+    ? (document.querySelector(".display").innerText = "")
+    : (document.querySelector(".display").innerText = display);
 }
+
 function getDisplay() {
-  return document.querySelector(".display").innerHTML;
+  return document.querySelector(".display").innerText;
 }
 /*----------------------------- Fringe Cases ------------------------------*/
 // DONE: press operator multiple times - expected behaviour to operate on accumulator & displayed num
